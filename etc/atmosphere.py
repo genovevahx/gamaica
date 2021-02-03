@@ -46,9 +46,6 @@ class Atmosphere:
 
     Seeing calculation is not included.
 
-    The implementation takes one data file from the ESO sky model that
-    was taken with standard parameters. For the moon brightness,
-    coefficients for moon-target and moon-sun separation are applied.
 
     The most convenient way to create a CAHA standard atmosphere is
     the function :func:`Atmosphere.caha`.
