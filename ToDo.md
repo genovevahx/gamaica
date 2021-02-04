@@ -2,7 +2,7 @@
 **basic ToDos:**
 * implement dispersion as a function of wavelength
 * maybe separate GAMAICA into explicit Telescope and Instrument classes
-* implement fiber fraction loss 
+* implement fiber fraction loss as a function wavelength and seeing
 * implement binning
 * add more template SEDs
 * phase-out pysynphot by implementing ArraySpectrum class locally
