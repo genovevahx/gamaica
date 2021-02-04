@@ -1,6 +1,7 @@
 
 **basic ToDos:**
 * implement dispersion as a function of wavelength
+* maybe separate GAMAICA into explicit Telescope and Instrument classes
 * implement fiber fraction loss 
 * implement binning
 * add more template SEDs
