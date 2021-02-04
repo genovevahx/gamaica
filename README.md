@@ -58,7 +58,7 @@ Things to note:
     *****
     
     
-    * Seeing calculation is not included and the fiber fraction (amount of star entering the fiber) is assumed to be 100%.
+    * A constant fiber fraction (amount of star entering the fiber) is assumed to be 80%. 
     * dispersion is assumed constant with wavelength
     * binning hasn't been implemented
     * Gray and Bright sky conditions are for the time being approximated by simply using the dark sky spectrum at CAHA and scaling it to a user-specified magnitude in a user-selected filter
