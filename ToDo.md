@@ -8,6 +8,7 @@
   - add more filter transmission curves
 * add test functions
 * update __init__.py
+* implement gray and bright sky emission correctly (currently just scaling dark sky)
 
 **Comments from Ole Streicher on improving the code:**
 
