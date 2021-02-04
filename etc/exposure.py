@@ -79,7 +79,7 @@ class Exposure:
         self.nsky_fib = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second/u.AA)
         self.nsky_pix = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second)
         self.nsky_photlam = np.zeros(self.spectrograph.wavelength_perpix.shape) *(  u.photon/u.second/u.cm**2/u.AA)
-        
+        self.total_efficiency = np.ones(self.spectrograph.wavelength_perpix.shape)
         
     def add_object(self, sed, wavelength=None):
         '''Add some object flux
@@ -125,9 +125,9 @@ class Exposure:
         idx = abs(self.wavelength.to('AA').value - sed.pivot_wave).argmin()
         
         print(f'\nAt pivot wavelength {self.wavelength[idx]:.0f} of filter:')
-        print(f'Object flam: {sed.sed.flux[idx]:.5e} erg / (Angstrom cm2 s)' )
-        print(f'Object photons/m2: {nobj_A[idx]:.5e} ')
-        print(f'Spatial sampling: {self.spectrograph.fib_area:.3f}')
+        print(f'Object flam:           {sed.sed.flux[idx].value:.5e} erg / (Angstrom cm2 s)' )
+        print(f'Object photons/m2:     {nobj_A[idx]:.5e} ')
+        print(f'Spatial sampling:      {self.spectrograph.fib_area:.3f}')
         #print(f'fraction of star/fiber: {(self.spectrograph.fib_diam/fwhm)**2)}')
         print(f'Object photons/fiber:  {nobj_fib[idx]:.5e}')
         print(f'Object photons/pixel:  {nobj_pix[idx]:.5e}')
@@ -160,9 +160,6 @@ class Exposure:
         '''
         
         sed.convert('photlam')
-        print('SED fluxunits')
-        print(sed.fluxunits)
-        print(sed.flux)
         ''' this conversion seems to strip sed.sed.flux from its units
         but not sed.sed.wave! Inconvenient.'''
 
@@ -181,8 +178,6 @@ class Exposure:
         # convert
         nsky_A = flux_perpix.to('ph s**-1 m**-2 AA**-1') ## silent 'per arcsec2' here
         nsky_fib = nsky_A * self.spectrograph.A_tel * self.spectrograph.fib_area.value # fib_area stripped of units because 'per arcsec2' is silent
-        print('Final units')
-        print(nsky_fib)
 
         ## this formula below for nobj_pix needs checking. I assume that 1 AA = 1/ldisp pixels. Correct?
         nsky_pix = nsky_fib * self.spectrograph.ldisp
@@ -192,9 +187,9 @@ class Exposure:
         idx = abs(self.wavelength.to('AA').value - 5479.35188).argmin()
 
         print(f'\nAt pivot wavelength 5479 Angstrom of Vband:')
-        print(f'Sky flam: {sed.flux[idx]:.5e} erg / (Angstrom cm2 s)' )
-        print(f'Sky photons/m2: {nsky_A[idx]:.5e} ')
-        print(f'Spatial sampling: {self.spectrograph.fib_area:.3f}')
+        print(f'Sky flam:           {sed.flux[idx].value:.5e} erg / (Angstrom cm2 s)' )
+        print(f'Sky photons/m2:     {nsky_A[idx]:.5e} ')
+        print(f'Spatial sampling:   {self.spectrograph.fib_area:.3f}')
         #print(f'fraction of sky/fiber: {(self.spectrograph.fib_diam/fwhm)**2)}')
         print(f'Sky photons/fiber:  {nsky_fib[idx]:.5e}')
         print(f'Sky photons/pixel:  {nsky_pix[idx]:.5e}')
@@ -242,7 +237,7 @@ class Exposure:
         #    flux = self.spectrograph.rebin(wavelength, flux)
         
         # add atmospheric transmission to tel+instr transmission
-        self.spectrograph.efficiency_perpix *=  trans_perpix
+        self.total_efficiency = self.spectrograph.efficiency_perpix * trans_perpix
 
 
     def expose(self, texp, nexp=1, xbin=4,ybin=4):
@@ -302,14 +297,14 @@ class Exposure:
         ## binning. Currently no binning
         nobj_pix = self.nobj_pix * xbin *ybin /16.0
 
-        ## tel+instr+atmo throughput (Q.E. included)
-        nobj_pix = nobj_pix * self.spectrograph.efficiency_perpix * texp
+        ## total_efficiency = tel+instr+atmo throughput (Q.E. included)
+        nobj_pix = nobj_pix * self.total_efficiency * texp
         
         ## binning. Currently no binning
         nsky_pix = self.nsky_pix * xbin *ybin /16.0
         
-        ## tel+instr+atmo throughput (Q.E. included)
-        nsky_pix = nsky_pix * self.spectrograph.efficiency_perpix * texp
+        ## total_efficiency = tel+instr+atmo throughput (Q.E. included)
+        nsky_pix = nsky_pix * self.total_efficiency * texp
 
         # summarize noise contributions
 

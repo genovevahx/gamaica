@@ -2,7 +2,6 @@ import pathlib
 import astropy.units as u
 
 datadir = pathlib.Path(__file__).parent / '../data'
-icrdir = pathlib.Path(__file__).parent / '../icr'
 seddir = pathlib.Path(__file__).parent / '../seds'
 dark_sky_Vmag_AB = 20.56490531013599 # dark sky AB mag in Johnson V
 
