@@ -19,3 +19,5 @@ fib_area = 0.916 * u.arcsec**2              # projected fiber area [arcsec2]
 minwave = 4300 * u.AA                       # minimum lambda of GAMAICA
 maxwave = 6800 * u.AA                       # maximum lambda of GAMAICA
 gain = 1.0 	                            # CCD gain [electrons/ADU]
+fiber_fraction = 0.8                        # assume constant fraction of point source entering
+                                            # fiber. This is actually wavelength and seeing dependent

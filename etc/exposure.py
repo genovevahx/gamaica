@@ -1,7 +1,7 @@
 import numpy as np
 import astropy.units as u
 from astropy.table import QTable
-
+from .stddata import fiber_fraction
 from .rebin import rebin_1d_flux_box,rebin_1d_trans_box
 
 class Exposure:
@@ -74,7 +74,6 @@ class Exposure:
         self.nobj_fib = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second/u.AA)
         self.nobj_pix = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second)
         self.nobj_photlam = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second/u.cm**2/u.AA)
-        self.nobj_fiber_frac = 1.0
         
         self.nsky_A = np.zeros(self.spectrograph.wavelength_perpix.shape) * ( u.photon/u.second/u.m**2/u.AA)
         self.nsky_fib = np.zeros(self.spectrograph.wavelength_perpix.shape) *( u.photon/u.second/u.AA)
@@ -116,7 +115,7 @@ class Exposure:
             print('Cannot add object. ****not implemented****')
             return
         nobj_A = flux_perpix.to('ph s**-1 m**-2 AA**-1')
-        nobj_fib = nobj_A * self.spectrograph.A_tel * self.spectrograph.fib_area.value
+        nobj_fib = nobj_A * self.spectrograph.A_tel * fiber_fraction
 
 
         ## this formula below for nobj_pix needs checking. I assume that 1 AA = 1/ldisp pixels. Correct?
@@ -151,10 +150,7 @@ class Exposure:
         ----------
         sed : :class:`pysynphot.spectrum.CompositeSourceSpectrum` or
                      `pysynphot.spectrum.SourceSpectrum`
-            flux density of sky in erg/s/cm2/AA.
-            This is actually sky surface brightness. The "per arcsec2" 
-            is implied but not explicit, otherwise the unit conversions
-            don't work.
+            surface brightness of sky in erg/s/cm2/AA/acrsec2.
 
         wavelength : :class:`astropy.units.Quantity`
             Wavelength bins for the flux. If not given, then the 
@@ -164,6 +160,9 @@ class Exposure:
         '''
         
         sed.convert('photlam')
+        print('SED fluxunits')
+        print(sed.fluxunits)
+        print(sed.flux)
         ''' this conversion seems to strip sed.sed.flux from its units
         but not sed.sed.wave! Inconvenient.'''
 
@@ -178,10 +177,12 @@ class Exposure:
         else:
             print('Cannot add sky emission. ****not implemented****')
             return
-        
+
+        # convert and add back the implicit per arcsec2
         nsky_A = flux_perpix.to('ph s**-1 m**-2 AA**-1')
         nsky_fib = nsky_A * self.spectrograph.A_tel * self.spectrograph.fib_area.value
-        
+        print('Final units')
+        print(nsky_fib)
 
         ## this formula below for nobj_pix needs checking. I assume that 1 AA = 1/ldisp pixels. Correct?
         nsky_pix = nsky_fib * self.spectrograph.ldisp
