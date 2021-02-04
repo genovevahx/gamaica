@@ -178,9 +178,9 @@ class Exposure:
             print('Cannot add sky emission. ****not implemented****')
             return
 
-        # convert and add back the implicit per arcsec2
-        nsky_A = flux_perpix.to('ph s**-1 m**-2 AA**-1')
-        nsky_fib = nsky_A * self.spectrograph.A_tel * self.spectrograph.fib_area.value
+        # convert
+        nsky_A = flux_perpix.to('ph s**-1 m**-2 AA**-1') ## silent 'per arcsec2' here
+        nsky_fib = nsky_A * self.spectrograph.A_tel * self.spectrograph.fib_area.value # fib_area stripped of units because 'per arcsec2' is silent
         print('Final units')
         print(nsky_fib)
 
